@@ -74,6 +74,7 @@ body {
   right: 1px;
   border-radius: 50%;
   cursor: pointer;
+  transition: 1s ease-in-out;
 }
 .sidebar {
   width: 50px;
@@ -163,9 +164,9 @@ body {
 }
 
 .movie-list-item-title {
-  background-color: #333;
+  background-color: #333333a8;
   padding: 0 10px;
-  font-size: 32px;
+  font-size: 25px;
   font-weight: bold;
   position: absolute;
   top: 10%;
@@ -174,7 +175,7 @@ body {
   transition: 1s all ease-in-out;
 }
 .movie-list-item-desc {
-  background-color: #333;
+  background-color: #333333a9;
   padding: 10px;
   font-size: 14px;
   position: absolute;
@@ -206,4 +207,54 @@ body {
   color: lightgrey;
   opacity: 0.5;
   cursor: pointer;
+}
+.container.active {
+  background-color: white;
+}
+.movie-list-title:nth-child(1) {
+  margin-top: 20px;
+}
+.movie-list-title.active {
+  color: black;
+}
+.sidebar.active {
+  background-color: white;
+}
+.left-menu-icon.active {
+  color: black;
+}
+.navbar-container.active {
+  background-color: white;
+  color: black;
+}
+.toggle.active {
+  background-color: black;
+}
+.toggle-ball.active {
+  background-color: white;
+  transform: translateX(-20px);
+}
+.arrow.active {
+  color: black;
+  opacity: 0.7;
+}
+@media only screen and (max-width: 940px) {
+  .menu-container {
+    display: none;
+  }
+  .featured-desc {
+    width: 300px;
+    color: lightgrey;
+    margin: 30px 0;
+  }
+  .featured-content {
+    height: 70vh;
+    padding: 50px;
+  }
+}
+
+@media only screen and (max-width: 450px) {
+  .featured-desc {
+    width: 200px;
+  }
 }
