@@ -1,103 +1,124 @@
-let movies = {
-  Her: {
-    src: "img/1.jpeg",
-    title: "Her",
-    description:
-      "In a near future, a lonely writer develops an unlikely relationship with an operating system designed to meet his every need.",
-  },
-  Inception: {
-    src: "img/2.jpeg",
-    title: "Inception",
-    description:
-      "A thief who enters the dreams of others to steal secrets from their subconscious is offered a chance to have his criminal history erased",
-  },
-  "The Shawshank Redemption": {
-    src: "img/3.jpg",
-    title: "The Shawshank",
-    description:
-      "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
-  },
-  Godfather: {
-    src: "img/4.jpg",
-    title: "Godfather",
-    description: "Description of Godfather.",
-  },
-  "Iron Man": {
-    src: "img/5.jpg",
-    title: "Avangers",
-    description: "Description of Iron Man.",
-  },
-  Cars: {
-    src: "img/6.jpg",
-    title: "Cars",
-    description: "Description of Cars.",
-  },
-  "Spider Man": {
-    src: "img/7.jpg",
-    title: "Spider Man",
-    description: "Description of Spider Man.",
-  },
-  DC: {
-    src: "img/8.jpg",
-    title: "Batman",
-    description: "Description of Batman.",
-  },
-};
+import { NEW_RELEASES, TV_SHOWS, ANIME, MOST_POPULAR } from "./mock/movies.js";
 
-let sliders = document.querySelectorAll(".movie-list");
-
-sliders.forEach((slider) => {
-  const movieTitles = Object.keys(movies);
-
-  for (let i = 0; i < movieTitles.length; i++) {
-    let slide = document.createElement("div");
-
-    const movieTitle = movieTitles[i];
-    const movie = movies[movieTitle];
-
-    slide.classList.add("movie-list-item");
-    slide.innerHTML = `
-      <img src="${movie.src}" alt="" class="movie-list-item-img" />
-      <span class="movie-list-item-title">${movie.title}</span>
-      <p class="movie-list-item-desc">${movie.description}</p>
-      <button class="movie-list-item-button">Watch</button>
-    `;
-    slider.appendChild(slide);
+const sliders = document.querySelectorAll(".movie-list");
+const movies = NEW_RELEASES;
+const tvShows = TV_SHOWS;
+const anime = ANIME;
+const mostPopular = MOST_POPULAR;
+let modalIsOpen = false;
+function toggleModal() {
+  if (modalIsOpen) {
+    document.getElementById("modal").style.display = "none";
+    modalIsOpen = false;
+  } else {
+    document.getElementById("modal").style.display = "flex";
+    modalIsOpen = true;
   }
-});
+}
+function createModal(movieTitle, movie) {
+  const modal = document.getElementById("modal");
+  modal.innerHTML = "";
 
-const arrows = document.querySelectorAll(".arrow");
-const movieLists = document.querySelectorAll(".movie-list");
+  const modalTitle = document.createElement("h1");
+  modalTitle.textContent = movieTitle;
 
-arrows.forEach((arrow, i) => {
-  const movieList = movieLists[i];
-  const sliderWidth = movieList.offsetWidth;
-  const itemWidth = movieList.querySelector(".movie-list-item").offsetWidth;
-  const visibleItems = Math.floor(sliderWidth / itemWidth);
-  let clickCounter = 0;
+  const modalDescription = document.createElement("p");
+  modalDescription.textContent = movie.description;
 
-  arrow.addEventListener("click", () => {
-    const totalItems = movieList.querySelectorAll(".movie-list-item").length;
-    const totalTranslateX = (totalItems - visibleItems) * itemWidth;
+  const modalImage = document.createElement("img");
+  modalImage.src = movie.src;
+  modalImage.alt = movieTitle;
+  modalImage.style.width = "100%";
 
-    clickCounter++;
-    if (clickCounter * itemWidth <= totalTranslateX) {
-      movieList.style.transform = `translateX(${-clickCounter * itemWidth}px)`;
-    } else {
-      movieList.style.transform = "translateX(0)";
-      clickCounter = 0;
+  const closeButton = document.createElement("button");
+  closeButton.textContent = "Close";
+  closeButton.addEventListener("click", toggleModal);
+
+  modal.appendChild(modalTitle);
+  modal.appendChild(modalImage);
+  modal.appendChild(modalDescription);
+  modal.appendChild(closeButton);
+}
+function initializeSwiper(selector, prevSelector, nextSelector) {
+  return new Swiper(selector, {
+    slidesPerView: "auto",
+    navigation: {
+      nextEl: nextSelector,
+      prevEl: prevSelector,
+    },
+  });
+}
+
+initializeSwiper(
+  ".new-releases-swiper",
+  ".new-releases-prev",
+  ".new-releases-next"
+);
+initializeSwiper(
+  ".most-popular-swiper",
+  ".most-popular-prev",
+  ".most-popular-next"
+);
+initializeSwiper(".tv-shows-swiper", ".tv-shows-prev", ".tv-shows-next");
+initializeSwiper(".anime-swiper", ".anime-prev", ".anime-next");
+function populateSwiper(moviesList, swiperWrapperSelector, category) {
+  const wrapper = document.querySelector(swiperWrapperSelector);
+  Object.keys(moviesList).forEach((title) => {
+    const movie = moviesList[title];
+    const slide = document.createElement("div");
+    slide.classList.add("swiper-slide");
+
+    slide.innerHTML = `
+      <div class="movie-list-item">
+        <img src="${movie.src}" alt="${title}" class="movie-list-item-img" />
+        <button class="movie-list-item-button" data-modal="${category}|${title}">Description</button>
+      </div>
+    `;
+    wrapper.appendChild(slide);
+  });
+}
+
+populateSwiper(NEW_RELEASES, ".new-releases-swiper .swiper-wrapper", "movies");
+populateSwiper(
+  MOST_POPULAR,
+  ".most-popular-swiper .swiper-wrapper",
+  "mostPopular"
+);
+populateSwiper(TV_SHOWS, ".tv-shows-swiper .swiper-wrapper", "tvShows");
+populateSwiper(ANIME, ".anime-swiper .swiper-wrapper", "anime");
+
+const buttons = document.querySelectorAll(".movie-list-item-button");
+buttons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const [category, movieTitle] = button.getAttribute("data-modal").split("|");
+    const allMovies = {
+      movies,
+      mostPopular,
+      tvShows,
+      anime,
+    };
+    const movie = allMovies[category][movieTitle];
+    if (movie) {
+      createModal(movieTitle, movie);
+      toggleModal();
     }
   });
 });
 
-let ball = document.querySelector(".toggle-ball");
-let items = document.querySelectorAll(
-  ".container,.movie-list-title,.navbar-container,.sidebar,.left-menu-icon,.toggle,.arrow"
-);
-ball.addEventListener("click", () => {
-  items.forEach((item) => {
-    item.classList.toggle("active");
-  });
-  ball.classList.toggle("active");
-  document.body.classList.toggle("light-mode");
+const themeSwitch = document.getElementById("themeSwitch");
+const body = document.body;
+
+if (localStorage.getItem("theme") === "dark") {
+  body.classList.add("dark-theme");
+  themeSwitch.checked = true;
+}
+
+themeSwitch.addEventListener("change", () => {
+  if (themeSwitch.checked) {
+    body.classList.add("dark-theme");
+    localStorage.setItem("theme", "dark");
+  } else {
+    body.classList.remove("dark-theme");
+    localStorage.setItem("theme", "light");
+  }
 });
